@@ -2,7 +2,7 @@
 RETVAL=0
 
 start() {
-        cd /CHIP_hotword/ && nohup python main.py &
+        cd /CHIP_hotword/ && nohup python bt.py &
 }
 
 stop() {

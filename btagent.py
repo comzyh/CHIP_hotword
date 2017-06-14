@@ -185,7 +185,8 @@ class BTAgent:
                 logging.exception(e)
             else:
                 self.sock = None
-            self.set_props('hci0', 'Discoverable', True)
+        self.remote_address = None
+        self.set_props('hci0', 'Discoverable', True)
 
 
 def start_agent():
