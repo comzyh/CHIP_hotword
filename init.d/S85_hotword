@@ -2,7 +2,7 @@
 RETVAL=0
 
 start() {
-        cd /CHIP_hotword/ && nohup python bt.py &
+        cd /CHIP_hotword/ && set_antenna ufl && python bt.py &
 }
 
 stop() {

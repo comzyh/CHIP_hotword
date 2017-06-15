@@ -1,8 +1,11 @@
+import subprocess
+import signal
+import sys
+
 import CHIP_IO.GPIO as gpio
 import alsaaudio
 import snowboydetect
 from btagent import start_agent
-import subprocess
 
 pinid = "CSID{0}"
 pinmap = [1, 2, 3, 4, 5, 6, 7]
@@ -59,4 +62,9 @@ def main():
 
 
 if __name__ == '__main__':
+    def handler_stop_signals(signum, frame):
+        gpio.cleanup()
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, handler_stop_signals)
     main()

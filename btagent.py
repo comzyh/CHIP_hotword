@@ -58,6 +58,8 @@ class BTAgent:
 
         self.connect_sock_loop_thread.start()
         self.connect_agent_loop_thread.start()
+        self.send_buf = None
+        self.send_buf_before = 0
         print("BTAgent init return")
 
     @classmethod
@@ -72,7 +74,7 @@ class BTAgent:
             return None
 
     def connect_sock(self, address):
-        uuid = "abcd1234-ab12-ab12-ab12-abcdef123456"
+        uuid = "8228F598-8DC8-4876-B71B-3D923A7C4BD3"
         if not address or not self.mac_pattern.match(address):
             return
         service_matches = find_service(uuid=uuid, address=address)
@@ -97,6 +99,9 @@ class BTAgent:
         except Exception as e:
             logging.exception(e)
             self.sock = None
+        else:
+            if self.send_buf and time.time() < self.send_buf_before:
+                self.send(self.send_buf, buf_on_error=False)
 
     def connect_agent(self):
         mainloop = GObject.MainLoop()
@@ -120,13 +125,16 @@ class BTAgent:
         print("mainloop.run")
         mainloop.run()
 
-    def send(self, data):
+    def send(self, data, buf_on_error=True):
         if self.sock:
             try:
                 self.sock.send(data)
             except Exception as e:
                 logging.exception(e)
                 self.sock = None
+                if buf_on_error:
+                    self.send_buf = data
+                    self.send_buf_before = time.time() + 5
 
     def connect_sock_loop(self):
         while True:
@@ -160,6 +168,7 @@ class BTAgent:
             with open(self.remote_address_file, 'w') as f:
                 f.write(remote_address)
             self.set_props('hci0', 'Discoverable', False)
+            self.set_props('sync')
 
     def set_trusted(self, path):
         try:
